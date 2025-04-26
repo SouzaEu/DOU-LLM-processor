@@ -1,8 +1,13 @@
 import os
 import zipfile
+import json
 import requests
-from datetime import date, datetime
+from datetime import date
 from lxml import etree
+from dotenv import load_dotenv
+
+# Carregar variáveis do .env
+load_dotenv()
 
 # CONFIGURAÇÕES
 PASTA_ZIP = 'entrada_zip'
@@ -11,13 +16,18 @@ PASTA_TEMP = 'temp_xml'
 ARQUIVO_LOG = 'log_processamento.txt'
 ARQUIVO_ALERTAS = 'alertas_erro.txt'
 
-login_email = "vinnysouzav@gmail.com"
-senha = "Viver0944"
+# Credenciais
+login_email = os.getenv('LOGIN_EMAIL')
+senha = os.getenv('LOGIN_SENHA')
+
+# DOU Seções
 tipo_dou = "DO1 DO2 DO3"  # Pode adicionar DO1E, DO2E, DO3E
 
+# URLs de login/download
 url_login = "https://inlabs.in.gov.br/logar.php"
 url_download = "https://inlabs.in.gov.br/index.php?p="
 
+# Sessão HTTP
 s = requests.Session()
 
 # 🔥 PARSERS 🔥
@@ -35,6 +45,17 @@ def parse_dou(xml_tree):
             })
     return materias_extraidas
 
+def parse_generico(xml_tree):
+    root = xml_tree.getroot()
+    materias_extraidas = []
+    for materia in root.findall('.//materia'):
+        mat_dict = {}
+        for elem in materia.iterchildren():
+            if elem.tag and elem.text:
+                mat_dict[elem.tag] = elem.text.strip()
+        materias_extraidas.append(mat_dict)
+    return materias_extraidas
+
 def parse_anvisa(xml_tree):
     return []
 
@@ -44,13 +65,24 @@ def parse_ibama(xml_tree):
 def parse_receita_federal(xml_tree):
     return []
 
+# Mapeamento de parser
 parser_map = {
     'DO1': parse_dou,
     'DO2': parse_dou,
     'DO3': parse_dou,
+    # Futuro: 'ANVISA': parse_anvisa,
+    # Futuro: 'IBAMA': parse_ibama,
 }
 
 # Funções auxiliares
+def limpar_texto(texto):
+    if not texto:
+        return None
+    texto = texto.strip()
+    texto = texto.replace('\n', ' ').replace('\r', ' ')
+    texto = ' '.join(texto.split())
+    return texto if texto else None
+
 def extrair_nome_fonte(nome_arquivo):
     partes = nome_arquivo.replace('.zip', '').split('-')
     if len(partes) >= 3:
@@ -65,7 +97,7 @@ def baixar_zips(data_str):
     login_payload = {"email": login_email, "password": senha}
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
-    print("Fazendo login...")
+    print("🔐 Fazendo login...")
     s.post(url_login, data=login_payload, headers=headers)
 
     for dou_secao in tipo_dou.split(' '):
@@ -77,9 +109,9 @@ def baixar_zips(data_str):
             caminho_zip = os.path.join(PASTA_ZIP, f"{data_str}-{dou_secao}.zip")
             with open(caminho_zip, 'wb') as f:
                 f.write(response.content)
-            print(f"Baixado: {caminho_zip}")
+            print(f"📥 Baixado: {caminho_zip}")
         else:
-            print(f"Falha ao baixar {data_str}-{dou_secao}.zip (Status {response.status_code})")
+            print(f"⚠️ Falha ao baixar {data_str}-{dou_secao}.zip (Status {response.status_code})")
 
 def limpar_temp():
     for arquivo in os.listdir(PASTA_TEMP):
@@ -91,9 +123,11 @@ def processar_zip(zip_path, log, alertas):
     nome_zip = os.path.basename(zip_path)
     fonte = extrair_nome_fonte(nome_zip)
 
-    if not fonte or fonte not in parser_map:
-        alertas.append(f"Fonte desconhecida: {nome_zip}")
+    if not fonte:
+        alertas.append(f"Fonte não detectada: {nome_zip}")
         return
+
+    parser = parser_map.get(fonte, parse_generico)  # Default para parser genérico se fonte não mapeada
 
     try:
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
@@ -102,24 +136,30 @@ def processar_zip(zip_path, log, alertas):
                 caminho_xml = os.path.join(PASTA_TEMP, nome_arquivo)
                 
                 tree = etree.parse(caminho_xml)
-                parser = parser_map[fonte]
                 materias = parser(tree)
 
                 if materias:
-                    novo_arquivo = nome_arquivo.replace('.xml', '_limpo.xml')
-                    caminho_saida = os.path.join(PASTA_SAIDA, novo_arquivo)
+                    novo_nome = nome_arquivo.replace('.xml', '')
+                    caminho_saida_xml = os.path.join(PASTA_SAIDA, f"{novo_nome}_limpo.xml")
+                    caminho_saida_json = os.path.join(PASTA_SAIDA, f"{novo_nome}_limpo.json")
 
+                    # Criar XML
                     root_saida = etree.Element('materias')
                     for mat in materias:
                         materia_elem = etree.SubElement(root_saida, 'materia')
                         for key, value in mat.items():
-                            if value:
+                            value_limpo = limpar_texto(value)
+                            if value_limpo:
                                 child = etree.SubElement(materia_elem, key)
-                                child.text = value
+                                child.text = value_limpo
                     tree_saida = etree.ElementTree(root_saida)
-                    tree_saida.write(caminho_saida, pretty_print=True, xml_declaration=True, encoding='UTF-8')
+                    tree_saida.write(caminho_saida_xml, pretty_print=True, xml_declaration=True, encoding='UTF-8')
 
-                    log.append(f"Processado {nome_arquivo} com parser {fonte}")
+                    # Criar JSON
+                    with open(caminho_saida_json, 'w', encoding='utf-8') as json_f:
+                        json.dump(materias, json_f, ensure_ascii=False, indent=4)
+
+                    log.append(f"Processado {nome_arquivo} com parser {parser.__name__}")
                 else:
                     alertas.append(f"Nenhuma matéria extraída de {nome_arquivo}")
 
@@ -152,7 +192,7 @@ def main():
         with open(ARQUIVO_ALERTAS, 'w', encoding='utf-8') as f:
             f.write('\n'.join(alertas))
 
-    print(f"✅ Processo concluído: {len(arquivos_zip)} arquivos.")
+    print(f"\n✅ Processo finalizado: {len(arquivos_zip)} arquivos.")
     if alertas:
         print(f"⚠️ {len(alertas)} alertas encontrados. Veja {ARQUIVO_ALERTAS}.")
 
