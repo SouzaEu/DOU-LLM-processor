@@ -25,17 +25,6 @@ Este repositório contém a implementação do back-end **core** para um SaaS de
 
 ---
 
-#MELHORAR README FUTURAMENTE AQUI...
-
-## Como rodar
-
-### Dependencias
-openai
-cx_Oracle
-lxml
-python-dotenv
-
-
 ## ⚙️ Como Funciona
 
 ### Etapa 1: **Captura de Dados**
