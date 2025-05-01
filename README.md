@@ -49,7 +49,7 @@ Este repositório contém a implementação do back-end **core** para um SaaS de
 ## 🧑‍💻 Como Contribuir
 
 1. **Clone o Repositório**:
-   - `git clone https://github.com/ExpoFlow/BackEnd-Core.git`
+   - `git clone https://github.com/ExpoFlowInc/BackEnd-Core.git`
    
 2. **Configuração Local**:
    - Instale as dependências necessárias:
