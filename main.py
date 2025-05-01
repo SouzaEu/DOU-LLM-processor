@@ -1,8 +1,8 @@
 
-from regulador_analise.utils.arquivos import garantir_pastas, salvar_json, limpar_temp
-from regulador_analise.utils.texto import limpar_texto, nome_arquivo_seguro
-from regulador_analise.utils.resumo import resumir_conteudo
-from regulador_analise.parser.dou_parser import parse_article
+from utils.arquivos import garantir_pastas, salvar_json, limpar_temp
+from utils.texto import limpar_texto, nome_arquivo_seguro
+from utils.resumo import resumir_conteudo
+from parser.dou_parser import parse_article
 from lxml import etree
 import os
 from dotenv import load_dotenv

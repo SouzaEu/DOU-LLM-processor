@@ -4,37 +4,6 @@
 
 Este repositório contém a implementação do back-end **core** para um SaaS de alertas regulatórios, focado em automatizar a extração de informações regulatórias de órgãos oficiais como ANVISA, Receita Federal, IBAMA, entre outros. O sistema irá monitorar mudanças de regulamentos, realizar análise de texto usando NLP (Processamento de Linguagem Natural) e notificar os usuários de forma automatizada sobre essas mudanças.
 
-## 🚀 Funcionalidades Futuras
-
-### 1. **Crawler de Reguladores**
-   - O sistema irá baixar periodicamente arquivos de fontes regulatórias (DOU, Receita Federal, ANVISA, IBAMA, etc).
-   - Suporte para diferentes tipos de arquivos, como XML, PDF e HTML.
-   - Integração com APIs públicas e privadas de órgãos reguladores.
-
-### 2. **Processamento de Dados (Parsing e Limpeza)**
-   - **Limpeza de XML**: Scripts dedicados a limpar e extrair as informações relevantes dos arquivos XML.
-   - **Análise de PDF**: Extração de dados estruturados de documentos PDF.
-   - **Parse de Dados**: Usaremos a biblioteca `lxml` para parse de XML e outros métodos para dados extraídos de PDFs e HTML.
-   - **NLP para Tradução Simples**: Integração com a API da OpenAI para traduzir os textos extraídos para uma linguagem mais acessível, sem jargões, destacando pontos de ação.
-
-### 3. **Notificação e Alerta**
-   - **Notificações Personalizadas**: O sistema enviará alertas via e-mail, Slack, SMS, ou até via webhook, dependendo da preferência do usuário.
-   - **Dashboard para Usuário**: Usuários poderão visualizar um histórico de alertas e mudanças com filtros específicos (por órgão, tipo de regulamento, etc).
-   - **API de Notificação**: Para integração com sistemas externos de monitoramento ou ERPs.
-
-### 4. **Sistema de Usuários**
-   - Cadastro e login de usuários com gerenciamento de permissões.
-   - Configuração de preferências de alertas (quais órgãos, tipos de mudança, canais de notificação).
-   - Histórico de alertas e notificações.
-   - **Gestão de Planos**: Suporte para planos Freemium, Basic, Pro e Enterprise, com controle de limite de alertas e funcionalidades.
-
-### 5. **Escalabilidade e Infraestrutura**
-   - **Microserviços**: Arquitetura orientada a microserviços, permitindo escalar individualmente cada parte do sistema (crawler, parser, NLP, notificação).
-   - **Infraestrutura em Nuvem**: Utilização do AWS Lambda para escalabilidade dos crawlers e integração com S3 para armazenamento dos arquivos.
-   - **Banco de Dados**: PostgreSQL para metadados e Elasticsearch para busca avançada de texto.
-
----
-
 ## 🛠 Arquitetura Técnica
 
 ### **Back-End**
@@ -55,6 +24,17 @@ Este repositório contém a implementação do back-end **core** para um SaaS de
 - **DevOps**: GitLab CI/CD, Docker para containerização
 
 ---
+
+#MELHORAR README FUTURAMENTE AQUI...
+
+## Como rodar
+
+### Dependencias
+openai
+cx_Oracle
+lxml
+python-dotenv
+
 
 ## ⚙️ Como Funciona
 
@@ -80,7 +60,7 @@ Este repositório contém a implementação do back-end **core** para um SaaS de
 ## 🧑‍💻 Como Contribuir
 
 1. **Clone o Repositório**:
-   - `git clone https://github.com/complyly/BackEnd-Core.git`
+   - `git clone https://github.com/ExpoFlow/BackEnd-Core.git`
    
 2. **Configuração Local**:
    - Instale as dependências necessárias:
