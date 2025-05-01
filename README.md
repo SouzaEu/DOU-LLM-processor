@@ -1,100 +1,104 @@
-# Core do SaaS de Alertas Regulatórios
+# MVP - BackEnd Processador de DOU com LLaMA
 
-## Visão Geral
-
-Este repositório contém a implementação do back-end **core** para um SaaS de alertas regulatórios, focado em automatizar a extração de informações regulatórias de órgãos oficiais como ANVISA, Receita Federal, IBAMA, entre outros. O sistema irá monitorar mudanças de regulamentos, realizar análise de texto usando NLP (Processamento de Linguagem Natural) e notificar os usuários de forma automatizada sobre essas mudanças.
-
-## 🛠 Arquitetura Técnica
-
-### **Back-End**
-- **Linguagem**: Java / Python (Dependendo da camada de processamento)
-- **Framework**: Spring Boot (Java) / Flask/Django (Python)
-- **Banco de Dados**: PostgreSQL (metadados), Elasticsearch (busca full-text)
-- **APIs de Integração**: Conectores com APIs de órgãos reguladores (como DOU, Receita Federal, ANVISA)
-- **Processamento de Dados**:
-  - NLP para simplificação de textos (OpenAI API)
-  - Lógica de Parse e limpeza de arquivos com `lxml` e `PyPDF2` (para PDF)
-
-### **Front-End**
-- **Tecnologias**: React + TailwindCSS
-- **Função**: Dashboard responsivo, exibição de alertas e configurações de preferências de usuário.
-
-### **Infraestrutura**
-- **Nuvem**: AWS (Lambda, RDS, S3, Elasticsearch)
-- **DevOps**: GitLab CI/CD, Docker para containerização
+Este projeto automatiza o download, extração, processamento e resumo de publicações do DOU (Diário Oficial da União), utilizando um modelo de linguagem local (LLaMA via Ollama). É modular e preparado para múltiplos órgãos no futuro.
 
 ---
 
-## ⚙️ Como Funciona
+## ✅ Funcionalidades
 
-### Etapa 1: **Captura de Dados**
-   - O sistema fará requisições regulares para baixar documentos dos sites oficiais dos órgãos reguladores.
-   - Isso inclui a consulta a APIs (DOU, Receita Federal) ou download direto de arquivos XML e PDF.
-   - O sistema usará credenciais de login, se necessário, para acessar essas fontes.
-
-### Etapa 2: **Processamento e Análise**
-   - Os arquivos baixados são limpos, estruturados e analisados usando técnicas de NLP para gerar resumos e destacar informações críticas.
-   - O sistema extrai os pontos principais como "o que mudou", "quando entra em vigor" e "como se adequar", criando resumos de fácil leitura.
-
-### Etapa 3: **Notificação**
-   - Após a análise, o sistema envia notificações aos usuários registrados através dos canais escolhidos (E-mail, Slack, etc).
-   - A notificação inclui um resumo com os pontos principais e um link para o documento original.
-
-### Etapa 4: **Dashboard**
-   - Os usuários poderão acessar um dashboard para visualizar o histórico de mudanças e alertas recebidos.
-   - Filtros de pesquisa serão oferecidos para refinar a visualização de alertas por órgão, data e tipo de documento.
+- Baixa arquivos `.zip` do DOU (seções DO1, DO2, DO3) do **dia atual**
+- Extrai os `.xml` e processa os conteúdos
+- Gera `JSON` com os metadados (órgão, data, título, conteúdo)
+- Envia o conteúdo para o **modelo LLaMA local** e salva o resumo
+- Se não houver publicação (ex: feriados), gera um aviso em `output/resumos/`
+- Preparado para integração com **banco Oracle** (script incluso)
 
 ---
 
-## 🧑‍💻 Como Contribuir
+## 🛠️ Como rodar o projeto (passo a passo)
 
-1. **Clone o Repositório**:
-   - `git clone https://github.com/ExpoFlowInc/BackEnd-Core.git`
-   
-2. **Configuração Local**:
-   - Instale as dependências necessárias:
-     - Para Java (Spring Boot): `mvn install`
-     - Para Python (Flask/Django): `pip install -r requirements.txt`
-   
-3. **Criação de Branch**:
-   - Crie uma branch para desenvolvimento de novas funcionalidades ou correções.
-   - `git checkout -b nome-da-branch`
-   
-4. **Commit e Push**:
-   - Realize alterações e faça commits de forma descritiva.
-   - `git add .`
-   - `git commit -m "Mensagem explicativa"`
-   - `git push origin nome-da-branch`
-   
-5. **Pull Request**:
-   - Abra um pull request no GitHub para que a equipe revise e integre as alterações.
+### 1. Clone o repositório ou extraia o .zip
+Certifique-se de estar na raiz do projeto.
 
----
+### 2. Instale o Python e as dependências
+Recomendado Python 3.10+
+```bash
+pip install -r requirements.txt
+```
 
-## 📦 Dependências
+### 3. Instale e rode o Ollama
+Baixe em: [https://ollama.com/download](https://ollama.com/download)
 
-- **Java**: Spring Boot
-- **Python**: Flask/Django, lxml, requests, PyPDF2
-- **Banco de Dados**: PostgreSQL, Elasticsearch
-- **Outras**: Docker, AWS SDK
+Depois, execute:
+```bash
+ollama run llama3
+```
 
----
+### 4. Crie o arquivo `.env` com suas credenciais Inlabs
+Na raiz do projeto, crie `.env` com:
+```
+INLABS_EMAIL=seu@email.com
+INLABS_SENHA=sua_senha
+```
 
-## 🔒 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais informações.
+### 5. Execute o script
+Estando na raiz do projeto:
+```bash
+python -m app.main
+```
 
 ---
 
-## 📝 TODO
+## 📦 Saídas do sistema
 
-- Completar integração com todos os órgãos reguladores (ANVISA, Receita Federal, IBAMA).
-- Implementar funções de personalização de alertas e notificação.
-- Melhorar a interface do usuário no dashboard.
+- `output/materias/` → JSONs com metadados completos
+- `output/resumos/` → JSONs com resumo via LLaMA
+- `logs/` → Logs de sucesso e erro
+- `temp/` → XMLs temporários extraídos
 
 ---
 
-## 🌐 Links Úteis
+## 🧠 Integração com Oracle
 
-- [Documentação da API do DOU](https://www.dou.gov.br)
-- [Documentação da API Receita Federal](https://www.receita.fazenda.gov.br)
+O script `app/envio_oracle.py` está pronto para uso futuro.  
+O esquema sugerido está em `estrutura_oracle.txt`.
+
+Instale a lib:
+```bash
+pip install cx_Oracle
+```
+
+Depois edite:
+```python
+dsn = cx_Oracle.makedsn("host", port, sid="XE")
+conn = cx_Oracle.connect("usuario", "senha", dsn)
+enviar_para_banco("output/resumos/exemplo.json", conn)
+```
+
+---
+
+## 🧩 Como adicionar novos órgãos
+
+Crie novos módulos:
+- `downloader_anvisa.py`
+- `extractor_anvisa.py`
+- `processor_anvisa.py`
+
+Depois importe e chame dentro do `main.py`.
+
+---
+
+## 🧪 Teste rápido
+
+Se não houver publicação no dia:
+```json
+{
+  "data": "2025-05-01",
+  "mensagem": "Nenhuma publicação do DOU foi encontrada nesta data. Feriado ou indisponibilidade."
+}
+```
+
+---
+
+## 👨‍💻 Autor
+Pedro Merisi | MVP FIAP + LLaMA + Oracle + Python
