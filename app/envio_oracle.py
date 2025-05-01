@@ -1,3 +1,4 @@
+from app.config import PASTA_ZIP, PASTA_TEMP, PASTA_MATERIAS, PASTA_RESUMOS
 # Script preparado para futura integração com Oracle Database via cx_Oracle
 
 import cx_Oracle

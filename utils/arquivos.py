@@ -1,11 +1,7 @@
+from app.config import PASTA_ZIP, PASTA_TEMP, PASTA_MATERIAS, PASTA_RESUMOS
 
 import os
 import json
-
-PASTA_ZIP = 'entrada_zip'
-PASTA_TEMP = 'temp_xml'
-PASTA_MATERIAS = 'saida_materias'
-PASTA_RESUMOS = 'saida_resumos'
 
 def garantir_pastas():
     for pasta in [PASTA_ZIP, PASTA_TEMP, PASTA_MATERIAS, PASTA_RESUMOS]:
