@@ -4,11 +4,17 @@ LLAMA_API_URL = "http://localhost:11434/api/generate"
 
 def resumir_texto(texto):
     prompt = (
-        "Leia o texto a seguir e gere:\n"
-        "- Um TÍTULO mais curto e legível (sem abreviações e com boas práticas de formatação)\n"
-        "- Um RESUMO claro, objetivo, em português simples e técnico, sem usar frases como 'aqui está o resumo'.\n\n"
+        "Você é um assistente especializado em regulamentos governamentais e legislação brasileira.\n"
+        "Leia atentamente o texto a seguir e produza duas coisas:\n\n"
+        "1. Um TÍTULO objetivo e informativo com no máximo 12 palavras, usando português claro e seguindo boas práticas de formatação. Evite siglas não explicadas e termos técnicos desnecessários.\n"
+        "2. Um RESUMO com até 4 parágrafos curtos, em português simples, explicando:\n"
+        "- Qual é a principal mudança ou novidade?\n"
+        "- Quem é impactado por essa mudança?\n"
+        "- O que muda na prática para empresas ou gestores?\n"
+        "- Quando isso passa a valer?\n\n"
+        "Evite frases como 'aqui está o resumo' e não repita o conteúdo sem explicá-lo. Escreva de forma didática, como se estivesse explicando para uma pequena empresa.\n\n"
         "Formato da resposta:\n"
-        "TÍTULO: <título resumido>\nRESUMO: <resumo objetivo>\n\n"
+        "TÍTULO: <título claro e informativo>\nRESUMO: <resumo bem estruturado>\n\n"
         f"TEXTO:\n{texto}"
     )
     payload = {
