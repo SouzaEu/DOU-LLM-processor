@@ -97,8 +97,3 @@ Se não houver publicação no dia:
   "mensagem": "Nenhuma publicação do DOU foi encontrada nesta data. Feriado ou indisponibilidade."
 }
 ```
-
----
-
-## 👨‍💻 Autor
-Pedro Merisi | MVP FIAP + LLaMA + Oracle + Python
