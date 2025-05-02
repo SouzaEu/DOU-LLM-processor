@@ -29,7 +29,7 @@ pip install -r requirements.txt
 ### 3. Instale e rode o Ollama
 Baixe em: [https://ollama.com/download](https://ollama.com/download)
 
-Depois, execute:
+Depois, execute em um cmd a parte:
 ```bash
 ollama run llama3
 ```
