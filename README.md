@@ -11,8 +11,7 @@ Este projeto automatiza o download, extração, processamento e resumo de public
 - Gera `JSON` com os metadados (órgão, data, título, conteúdo)
 - Envia o conteúdo para o **modelo LLaMA local** e salva o resumo
 - Se não houver publicação (ex: feriados), gera um aviso em `output/resumos/`
-- Preparado para integração com **banco Oracle** (script incluso)
-
+  
 ---
 
 ## 🛠️ Como rodar o projeto (passo a passo)
@@ -31,11 +30,11 @@ Baixe em: [https://ollama.com/download](https://ollama.com/download)
 
 Depois, execute em um cmd a parte:
 ```bash
-ollama run llama3
+ollama serve
 ```
 
-### 4. Crie o arquivo `.env` com suas credenciais Inlabs
-Na raiz do projeto, crie `.env` com:
+### 4. Mude o arquivo `.env` com suas credenciais Inlabs
+Na raiz do projeto, mude o `.env` com:
 ```
 INLABS_EMAIL=seu@email.com
 INLABS_SENHA=sua_senha
