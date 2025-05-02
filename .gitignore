@@ -1,0 +1,47 @@
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambiente virtual
+.venv/
+venv/
+ENV/
+env/
+
+# Arquivos de ambiente
+.env
+.env.*
+
+# Pastas de saída
+output/
+saida_*/
+entrada_*/
+temp*/
+logs/
+downloads/
+
+# Dados temporários
+*.log
+*.tmp
+*.bak
+*.swp
+
+# IDEs
+.vscode/
+.idea/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+*.sock
+
+# Arquivos de banco/credenciais
+*.db
+*.sqlite3
+oracle_wallet/
+*.p12
+*.pem

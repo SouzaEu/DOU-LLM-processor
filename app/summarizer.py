@@ -5,12 +5,13 @@ LLAMA_API_URL = "http://localhost:11434/api/generate"
 
 def resumir_texto(texto):
     prompt = (
-        "Você é um assistente especializado em legislação brasileira.\n"
-        "A partir do texto a seguir, gere:\n\n"
-        "1. TÍTULO no formato: 'Circular nº XXXX - Descrição breve da norma'\n"
-        "2. DESCRIÇÃO BREVE: Máximo 2 frases explicando diretamente a novidade.\n"
-        "3. RESUMO SIMPLIFICADO: 3 a 6 tópicos objetivos com até 15 palavras cada.\n"
-        "4. ÓRGÃO RESUMIDO: Nome claro e amigável do órgão responsável (ex: Banco Central, Diario Oficial da União, etc).\n"
+        "Você é um assistente especializado em legislação brasileira.\n\n"
+        "A partir do texto abaixo, gere os seguintes campos de forma clara e útil para exibição em sistemas e celulares:\n\n"
+        "1. TÍTULO CURTO: Resuma a norma de forma objetiva em até 12 palavras.\n"
+        "   Exemplo: 'Prorrogação do Processo Seletivo para Professor Substituto'.\n"
+        "2. DESCRIÇÃO BREVE: Em até 2 frases, explique diretamente a novidade ou impacto da norma.\n"
+        "3. RESUMO SIMPLIFICADO: De 3 a 6 tópicos com até 15 palavras cada, destacando os pontos principais.\n"
+        "4. ÓRGÃO RESUMIDO: Nome claro e compacto da instituição responsável, sem cargos nem formalidades. Ex: 'IFES - Campus Centro Serrano', 'Banco Central'.\n"
         "5. DATA DA NORMA: No formato YYYY-MM-DD, mesmo se aproximada com base no texto.\n\n"
         "Formato esperado:\n"
         "TÍTULO: <...>\n"
@@ -20,6 +21,7 @@ def resumir_texto(texto):
         "DATA DA NORMA: <...>\n\n"
         f"TEXTO:\n{texto}"
     )
+
     payload = {
         "model": "llama3",
         "prompt": prompt,
@@ -27,7 +29,9 @@ def resumir_texto(texto):
     }
 
     try:
-        response = requests.post(LLAMA_API_URL, json=payload, timeout=60)
+        print("⏳ Enviando texto ao modelo LLaMA para gerar resumo...")
+        response = requests.post(LLAMA_API_URL, json=payload, timeout=180)
+
         if response.ok:
             resultado = response.json().get("response", "")
             titulo = ""
@@ -48,7 +52,6 @@ def resumir_texto(texto):
                     orgao = linha.replace("ÓRGÃO:", "").strip()
                 elif linha.startswith("DATA DA NORMA:"):
                     data_norma = linha.replace("DATA DA NORMA:", "").strip()
-                    # Validação de formato de data
                     try:
                         datetime.strptime(data_norma, "%Y-%m-%d")
                     except ValueError:
@@ -62,6 +65,18 @@ def resumir_texto(texto):
                 "data_norma": data_norma
             }
         else:
-            return {"titulo_resumido": "Erro", "descricao_breve": "", "resumo_simplificado": ["Erro na resposta da API"], "orgao_resumido": "", "data_norma": ""}
+            return {
+                "titulo_resumido": "Erro",
+                "descricao_breve": "",
+                "resumo_simplificado": ["Erro na resposta da API"],
+                "orgao_resumido": "",
+                "data_norma": ""
+            }
     except Exception as e:
-        return {"titulo_resumido": "Erro", "descricao_breve": "", "resumo_simplificado": [f"Erro: {str(e)}"], "orgao_resumido": "", "data_norma": ""}
+        return {
+            "titulo_resumido": "Erro",
+            "descricao_breve": "",
+            "resumo_simplificado": [f"Erro: {str(e)}"],
+            "orgao_resumido": "",
+            "data_norma": ""
+        }

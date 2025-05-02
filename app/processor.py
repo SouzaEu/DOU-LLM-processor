@@ -18,17 +18,29 @@ def processar_xmls_extraidos(pasta_xml, log, alertas, pasta_materias):
                 conteudo = limpar_texto(materia.get('conteudo') or materia.get('texto'))
                 if not (orgao and titulo and conteudo):
                     continue
+
+                print(f"🟡 Gerando resumo para: {titulo[:60]}...")
+
                 base_nome = nome_arquivo_seguro(f"{orgao}_{titulo}")[:80]
+                resultado = resumir_texto(conteudo)
+
                 materia_formatada = {
                     "orgao": orgao,
                     "data": materia.get('data'),
                     "titulo": titulo,
-                    "conteudo": conteudo
+                    "conteudo": conteudo,
+                    "titulo_resumido": resultado.get("titulo_resumido", ""),
+                    "descricao_breve": resultado.get("descricao_breve", ""),
+                    "resumo_simplificado": resultado.get("resumo_simplificado", []),
+                    "orgao_resumido": resultado.get("orgao_resumido", ""),
+                    "data_norma": resultado.get("data_norma", "")
                 }
-                resultado = resumir_texto(conteudo)
-                materia_formatada['titulo_resumido'] = resultado['titulo_resumido']
-                materia_formatada['resumo'] = resultado['resumo']
-                salvar_json(materia_formatada, os.path.join(pasta_materias, f"{base_nome}.json"))
+
+                caminho_saida = os.path.join(pasta_materias, f"{base_nome}.json")
+                salvar_json(materia_formatada, caminho_saida)
+
+                print(f"✅ Resumo salvo: {caminho_saida}")
                 log.write(f"[OK] {arquivo_xml}\n")
         except Exception as e:
             alertas.write(f"[ERRO] {arquivo_xml} - {str(e)}\n")
+            print(f"❌ Erro ao processar {arquivo_xml}: {e}")

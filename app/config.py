@@ -8,6 +8,7 @@ LOGIN_EMAIL = os.getenv("INLABS_EMAIL")
 LOGIN_SENHA = os.getenv("INLABS_SENHA")
 
 # Diretórios e URLs
+PASTA_ZIP = "entrada_zip"
 PASTA_TEMP = "temp"
 PASTA_MATERIAS = "output/materias"
 PASTA_RESUMOS = "output/resumos"
@@ -20,6 +21,7 @@ URL_LOGIN = "https://inlabs.in.gov.br/logar.php"
 URL_DOWNLOAD = "https://inlabs.in.gov.br/index.php?p="
 
 # Criação automática de pastas
+os.makedirs(PASTA_ZIP, exist_ok=True)
 os.makedirs(PASTA_TEMP, exist_ok=True)
 os.makedirs(PASTA_MATERIAS, exist_ok=True)
 os.makedirs(PASTA_RESUMOS, exist_ok=True)
