@@ -1,4 +1,4 @@
-# MVP - BackEnd Processador de DOU com LLaMA
+# BackEnd Processador das normas com LLM
 
 Este projeto automatiza o download, extração, processamento e resumo de publicações do DOU (Diário Oficial da União), utilizando um modelo de linguagem local (LLaMA via Ollama). É modular e preparado para múltiplos órgãos no futuro.
 
